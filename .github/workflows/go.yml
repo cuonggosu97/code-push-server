@@ -20,7 +20,7 @@ jobs:
         go-version: '1.22.4'
 
     - name: Build
-      run: CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o code-push-server-go main.go
+      run: CGO_ENABLED=0 GOOS=linux  GOARCH=amd64 go build -o code-push-server-go main.go
 
     - name: Permission
       run: chmod +x code-push-server-go
