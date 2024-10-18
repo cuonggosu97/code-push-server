@@ -2,7 +2,7 @@
     "DBUser": {
         "Write": {
             "UserName": "root",
-            "Password": "",
+            "Password": "Cody1997@",
             "Host": "127.0.0.1",
             "Port": 3306,
             "DBname": "code-push"

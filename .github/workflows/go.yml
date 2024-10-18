@@ -5,25 +5,23 @@ name: Code-Push-Server-Go
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-
   build:
     runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.22.4'
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.22.4"
 
-    - name: Build
-      run: CGO_ENABLED=0 GOOS=linux  GOARCH=amd64 go build -o code-push-server-go main.go
+      - name: Build
+        run: CGO_ENABLED=0 GOOS=linux  GOARCH=amd64 go build -o code-push-server-go main.go
 
-    - name: Permission
-      run: chmod +x code-push-server-go
-
-    - name: Run
-      run: ./code-push-server-go
+      - name: Restart Application
+        run: |
+          pkill code-push-server-go || true
+          nohup ./code-push-server-go > app.log 2>&1 &
