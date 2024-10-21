@@ -3,6 +3,8 @@ package request
 import (
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	"com.lc.go.codepush/server/config"
@@ -129,18 +131,37 @@ func (Client) ReportStatus(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "OK")
 }
 
-type downloadReq struct {
-	ClientUniqueId *string `json:"client_unique_id"`
-	DeploymentKey  *string `json:"deployment_key"`
-	Label          *string `json:"label"`
-}
+// type downloadReq struct {
+// 	ClientUniqueId *string `json:"client_unique_id"`
+// 	DeploymentKey  *string `json:"deployment_key"`
+// 	Label          *string `json:"label"`
+// }
 
 func (Client) Download(ctx *gin.Context) {
-	json := downloadReq{}
-	ctx.BindJSON(&json)
-	pack := model.GetOne[model.Package]("id=?", json.Label)
-	if pack != nil {
-		model.Package{}.AddInstalled(*pack.Id)
+	// json := downloadReq{}
+	// ctx.BindJSON(&json)
+	// pack := model.GetOne[model.Package]("id=?", json.Label)
+	// if pack != nil {
+	// 	model.Package{}.AddInstalled(*pack.Id)
+	// }
+	// Lấy tên tệp từ query parameter (?file=)
+	fileName := ctx.Query("file")
+	if fileName == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "File name is required"})
+		return
 	}
-	ctx.String(http.StatusOK, "OK")
+
+	// Đảm bảo tệp nằm trong thư mục ./files/
+	filePath := filepath.Join("bundles", filepath.Clean(fileName))
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+		return
+	}
+
+	// Đặt header cho việc tải xuống
+	ctx.Header("Content-Disposition", "attachment; filename="+fileName)
+	ctx.Header("Content-Type", "application/octet-stream")
+
+	// Trả về tệp dưới dạng stream
+	ctx.File(filePath)
 }
