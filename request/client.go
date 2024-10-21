@@ -151,18 +151,19 @@ func (Client) Download(ctx *gin.Context) {
 		return
 	}
 
-	// Đảm bảo tệp nằm trong thư mục ./files/
-	filePath := filepath.Join("bundles", filepath.Clean(fileName))
-	log.Println("File path: ", filePath)
+	// Lấy thư mục làm việc hiện tại và nối với thư mục 'bundles'
+	wd, _ := os.Getwd()
+	filePath := filepath.Join(wd, "bundles", filepath.Clean(fileName))
+
+	log.Println("File path:", filePath) // Log đường dẫn đầy đủ
+
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
 	}
 
-	// Đặt header cho việc tải xuống
+	// Đặt header và trả về file
 	ctx.Header("Content-Disposition", "attachment; filename="+fileName)
 	ctx.Header("Content-Type", "application/octet-stream")
-
-	// Trả về tệp dưới dạng stream
 	ctx.File(filePath)
 }
