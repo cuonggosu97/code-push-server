@@ -152,7 +152,7 @@ func (Client) Download(ctx *gin.Context) {
 	}
 
 	// Đảm bảo tệp nằm trong thư mục ./files/
-	filePath := filepath.Join("bundles", filepath.Clean(fileName))
+	filePath := filepath.Join("../bundles", filepath.Clean(fileName))
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
 		return
