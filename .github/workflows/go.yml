@@ -24,4 +24,4 @@ jobs:
       - name: Restart Application
         run: |
           pkill -f code-push-server-go || true  # Tắt phiên bản cũ nếu có
-          nohup ./code-push-server-go > app.log 2>&1 &
+          ./code-push-server-go
