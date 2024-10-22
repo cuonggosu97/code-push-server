@@ -38,7 +38,7 @@
         }
     },
     "UrlPrefix": "/",
-    "ResourceUrl": "",
+    "ResourceUrl": "https://code-push.manhdd.id.vn",
     "Port": ":8080",
     "TokenExpireTime": 30
 }
