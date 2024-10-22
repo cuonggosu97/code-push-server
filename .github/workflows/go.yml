@@ -18,10 +18,24 @@ jobs:
         with:
           go-version: "1.22.4"
 
-      - name: Build
-        run: CGO_ENABLED=0 GOOS=linux  GOARCH=amd64 go build -o code-push-server-go main.go
+      - name: Build Application
+        run: |
+          echo "Building the application..."
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o code-push-server-go main.go
+          find $(pwd) -name code-push-server-go  # Kiểm tra xem binary được build ở đâu
+          echo "Build completed successfully."
 
       - name: Restart Application
         run: |
-          pkill -f code-push-server-go || true  # Tắt phiên bản cũ nếu có
-          ./code-push-server-go
+          echo "Restarting the application..."
+          cd $GITHUB_WORKSPACE  # Chuyển đến thư mục làm việc chính
+          binary_path=$(find $(pwd) -name code-push-server-go | head -n 1)
+          if [ -z "$binary_path" ]; then
+            echo "Binary not found! Exiting..."
+            exit 1
+          fi
+          pkill -f code-push-server-go || true  # Tắt ứng dụng cũ nếu có
+          nohup "$binary_path" > app.log 2>&1 &
+          sleep 2  # Chờ ứng dụng khởi động
+          pgrep -f code-push-server-go || { echo "Application failed to start."; exit 1; }
+          echo "Application restarted successfully."
